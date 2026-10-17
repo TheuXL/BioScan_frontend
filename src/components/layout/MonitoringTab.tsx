@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchFiresSyncStatus, fetchFiresByCountry } from '../../api/endpoints/fire';
 import { fetchExtinctionSyncStatus } from '../../api/endpoints/globe';
 import { PanelEmpty, PanelLoading } from '../ui/PanelState';
-import { formatDate } from '../../lib/format';
+import { formatDate, formatInteger } from '../../lib/format';
 import { useIsLayerActive } from '../../hooks/useLayerActive';
 
 function SyncRow({ label, value }: { label: string; value: string }) {
@@ -14,10 +14,10 @@ function SyncRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function readFireCountryCount(data: Record<string, unknown>): string | null {
-  if (typeof data.count === 'number') return String(data.count);
-  if (Array.isArray(data.data)) return String(data.data.length);
-  if (Array.isArray(data.fires)) return String(data.fires.length);
+function readFireCountryCount(data: Record<string, unknown>): number | null {
+  if (typeof data.count === 'number') return data.count;
+  if (Array.isArray(data.data)) return data.data.length;
+  if (Array.isArray(data.fires)) return data.fires.length;
   return null;
 }
 
@@ -54,7 +54,7 @@ export function MonitoringTab() {
   if (!fireActive && !speciesActive) {
     return (
       <div className="px-2">
-        <PanelEmpty message="Active uma camada para ver actualizações." />
+        <PanelEmpty message="Ative uma camada para ver atualizações." />
       </div>
     );
   }
@@ -63,7 +63,7 @@ export function MonitoringTab() {
 
   return (
     <div className="flex flex-col gap-3 px-2 overflow-y-auto">
-      <p className="text-xs text-on-surface-variant px-1">Actualização dos dados activos</p>
+      <p className="text-xs text-on-surface-variant px-1">Atualização dos dados ativos</p>
 
       {fireActive && fireSync.data && (
         <SyncRow
@@ -72,14 +72,14 @@ export function MonitoringTab() {
             fireSync.data.lastSyncTime
               ? formatDate(fireSync.data.lastSyncTime)
               : fireSync.data.isRunning
-                ? 'A actualizar…'
+                ? 'Atualizando…'
                 : '—'
           }
         />
       )}
 
       {fireActive && brFires != null && (
-        <SyncRow label="Focos no Brasil (24h)" value={brFires} />
+        <SyncRow label="Focos no Brasil (24h)" value={formatInteger(brFires)} />
       )}
 
       {speciesActive && extinctionSync.data?.lastSyncTime && (
@@ -89,7 +89,7 @@ export function MonitoringTab() {
         />
       )}
 
-      {!hasAny && <PanelEmpty message="Sem informação de actualização disponível." />}
+      {!hasAny && <PanelEmpty message="Sem informação de atualização disponível." />}
     </div>
   );
 }

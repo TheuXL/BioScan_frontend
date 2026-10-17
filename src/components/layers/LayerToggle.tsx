@@ -43,7 +43,7 @@ export function LayerToggle({ layer }: LayerToggleProps) {
           <p className="text-xs text-on-surface-variant mt-1">{layer.descricaoCurta}</p>
           {isActive && counts && (
             <p className="font-label text-secondary-container mt-1">
-              {formatLayerCount(counts.count)}
+              {formatLayerCount(counts.count, counts.totalMatching)}
             </p>
           )}
           {isActive && meta && (
@@ -62,7 +62,7 @@ export function LayerToggle({ layer }: LayerToggleProps) {
                 }}
               >
                 <RotateCcw className="w-3 h-3" />
-                Retry
+                Tentar de novo
               </button>
             </div>
           )}

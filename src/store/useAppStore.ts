@@ -29,6 +29,7 @@ interface AppState {
   setLayerStatus: (id: string, status: LayerStatus) => void;
   setLayerCount: (id: string, count: number, totalMatching?: number) => void;
   setSidebarTab: (tab: SidebarTab) => void;
+  setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
   toggleDetail: () => void;
 }
@@ -43,7 +44,7 @@ export const useAppStore = create<AppState>((set) => ({
   fireDateRange: null,
   layerStatus: {},
   layerCounts: {},
-  ui: { sidebarOpen: true, detailOpen: true, sidebarTab: 'layers' },
+  ui: { sidebarOpen: false, detailOpen: true, sidebarTab: 'layers' },
 
   setDomain: (domain) =>
     set(() => ({
@@ -79,14 +80,22 @@ export const useAppStore = create<AppState>((set) => ({
     set((s) => ({
       selectedPoint: p,
       pickedLocation: p ? null : s.pickedLocation,
-      ui: { ...s.ui, detailOpen: p !== null ? true : s.ui.detailOpen },
+      ui: {
+        ...s.ui,
+        detailOpen: p !== null ? true : s.ui.detailOpen,
+        sidebarOpen: p !== null ? false : s.ui.sidebarOpen,
+      },
     })),
 
   setPickedLocation: (loc) =>
     set((s) => ({
       pickedLocation: loc,
       selectedPoint: loc ? null : s.selectedPoint,
-      ui: { ...s.ui, detailOpen: loc !== null ? true : s.ui.detailOpen },
+      ui: {
+        ...s.ui,
+        detailOpen: loc !== null ? true : s.ui.detailOpen,
+        sidebarOpen: loc !== null ? false : s.ui.sidebarOpen,
+      },
     })),
 
   setVisibleBbox: (bbox) => set({ visibleBbox: bbox }),
@@ -108,6 +117,11 @@ export const useAppStore = create<AppState>((set) => ({
   setSidebarTab: (tab) =>
     set((s) => ({
       ui: { ...s.ui, sidebarTab: tab },
+    })),
+
+  setSidebarOpen: (open) =>
+    set((s) => ({
+      ui: { ...s.ui, sidebarOpen: open },
     })),
 
   toggleSidebar: () =>

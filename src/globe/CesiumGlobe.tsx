@@ -63,7 +63,7 @@ export function CesiumGlobe() {
     <div
       ref={containerRef}
       className="absolute inset-0 z-0"
-      aria-label="Globo terrestre interactivo"
+      aria-label="Globo terrestre interativo"
     />
   );
 }

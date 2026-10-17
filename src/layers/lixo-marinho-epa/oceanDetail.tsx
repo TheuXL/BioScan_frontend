@@ -21,7 +21,7 @@ export function OceanDetail({ point }: { point: PontoGloboV1 }) {
       <div className="glass-panel rounded-lg p-3 bg-secondary-container/5">
         <p className="font-label text-outline uppercase mb-1">O que é este ponto</p>
         <p className="text-on-surface leading-relaxed">
-          Um único registo de detrito marinho — <strong>não</strong> é peso (kg/toneladas) nem
+          Um único registro de detrito marinho — <strong>não</strong> é peso (kg/toneladas) nem
           volume. Representa um item observado ou recolhido numa expedição da EPA.
         </p>
       </div>

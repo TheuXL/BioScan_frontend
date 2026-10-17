@@ -1,24 +1,54 @@
 import type { PontoGloboV1 } from '../api/types/globe';
 
+const LOCALE = 'pt-BR';
+
 export function formatCoordinates(lat: number, lon: number): string {
   const latDir = lat >= 0 ? 'N' : 'S';
-  const lonDir = lon >= 0 ? 'E' : 'W';
-  return `${Math.abs(lat).toFixed(4)}° ${latDir}, ${Math.abs(lon).toFixed(4)}° ${lonDir}`;
+  const lonDir = lon >= 0 ? 'L' : 'O';
+  return `${Math.abs(lat).toFixed(2)}° ${latDir}, ${Math.abs(lon).toFixed(2)}° ${lonDir}`;
 }
 
 export function formatDate(iso: string | null): string {
   if (!iso) return '—';
-  return new Intl.DateTimeFormat('pt-PT', {
+  return new Intl.DateTimeFormat(LOCALE, {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(iso));
 }
 
+export function formatDateShort(iso: string | null): string {
+  if (!iso) return '—';
+  return new Intl.DateTimeFormat(LOCALE, {
+    day: '2-digit',
+    month: 'short',
+  }).format(new Date(iso));
+}
+
+export function formatRelativeTime(iso: string | null): string {
+  if (!iso) return '—';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '—';
+
+  const diffSec = Math.round((date.getTime() - Date.now()) / 1000);
+  const abs = Math.abs(diffSec);
+  const rtf = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' });
+
+  if (abs < 60) return rtf.format(diffSec, 'second');
+  if (abs < 3600) return rtf.format(Math.round(diffSec / 60), 'minute');
+  if (abs < 86400) return rtf.format(Math.round(diffSec / 3600), 'hour');
+  if (abs < 86400 * 30) return rtf.format(Math.round(diffSec / 86400), 'day');
+  return formatDate(iso);
+}
+
 export function formatNumber(value: number, decimals = 1): string {
-  return value.toLocaleString('pt-PT', {
+  return value.toLocaleString(LOCALE, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
+}
+
+export function formatInteger(value: number): string {
+  return value.toLocaleString(LOCALE);
 }
 
 export function pointKey(p: PontoGloboV1): string {
@@ -46,6 +76,9 @@ export function archiveDateRange(days = 7): { startDate: string; endDate: string
   return { startDate: fmt(start), endDate: fmt(end) };
 }
 
-export function formatLayerCount(count: number): string {
-  return `${count.toLocaleString('pt-PT')} no mapa`;
+export function formatLayerCount(count: number, totalMatching?: number): string {
+  if (totalMatching != null && totalMatching > count) {
+    return `Exibindo ${formatInteger(count)} de ${formatInteger(totalMatching)}`;
+  }
+  return `${formatInteger(count)} no mapa`;
 }

@@ -28,7 +28,7 @@ export function GeleiraDetail({ point }: { point: PontoGloboV1 }) {
       {area != null && (
         <p>
           <span className="font-label text-outline">ÁREA</span>{' '}
-          <span className="font-label-md">{Number(area).toLocaleString('pt-PT', { maximumFractionDigits: 4 })} km²</span>
+          <span className="font-label-md">{Number(area).toLocaleString('pt-BR', { maximumFractionDigits: 4 })} km²</span>
         </p>
       )}
       {status != null && (

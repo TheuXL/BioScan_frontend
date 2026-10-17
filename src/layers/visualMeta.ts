@@ -7,10 +7,10 @@ export interface LayerVisualMeta {
 
 export const LAYER_VISUAL_META: Record<string, LayerVisualMeta> = {
   'lixo-marinho-epa': {
-    unidadePonto: 'Cada ponto = 1 registo de detrito marinho (item observado ou recolhido)',
-    unidadeCluster: 'registos',
-    legendaCluster: 'Números no mapa = quantidade de registos agrupados nesta área',
-    dicaZoom: 'Aproxime o zoom para ver cada registo individualmente',
+    unidadePonto: 'Cada ponto = 1 registro de detrito marinho (item observado ou recolhido)',
+    unidadeCluster: 'registros',
+    legendaCluster: 'Números no mapa = quantidade de registros agrupados nesta área',
+    dicaZoom: 'Aproxime o zoom para ver cada registro individualmente',
   },
   'incendio-nasa': {
     unidadePonto: 'Cada ponto = 1 foco de calor detectado por satélite (NASA FIRMS)',
