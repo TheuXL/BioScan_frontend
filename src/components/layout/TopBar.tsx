@@ -1,15 +1,15 @@
 import { useState, type FormEvent } from 'react';
-import { RefreshCw, Settings, User, Search } from 'lucide-react';
+import { RefreshCw, Search } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { AppDomain } from '../../layers/types';
 import { useAppStore } from '../../store/useAppStore';
 import { parseCoordinates } from '../../lib/format';
 
 const DOMAINS: { id: AppDomain; label: string }[] = [
-  { id: 'fire', label: 'Fire' },
-  { id: 'ocean', label: 'Ocean' },
-  { id: 'climate', label: 'Climate' },
-  { id: 'forests', label: 'Forests' },
+  { id: 'fire', label: 'Fogo' },
+  { id: 'ocean', label: 'Oceano' },
+  { id: 'climate', label: 'Clima' },
+  { id: 'forests', label: 'Florestas' },
 ];
 
 interface TopBarProps {
@@ -74,21 +74,11 @@ export function TopBar({ activeDomain, onDomainChange }: TopBarProps) {
         <button
           type="button"
           className="text-secondary hover:text-secondary-container transition-colors p-1"
-          aria-label="Actualizar dados"
+          aria-label="Atualizar dados"
           onClick={() => queryClient.invalidateQueries()}
         >
           <RefreshCw className="w-5 h-5" />
         </button>
-        <button
-          type="button"
-          className="text-secondary hover:text-secondary-container transition-colors p-1"
-          aria-label="Definições"
-        >
-          <Settings className="w-5 h-5" />
-        </button>
-        <div className="w-8 h-8 rounded-full overflow-hidden border border-outline/30 ml-1 bg-surface-container-high flex items-center justify-center">
-          <User className="w-4 h-4 text-outline" />
-        </div>
       </div>
     </nav>
   );

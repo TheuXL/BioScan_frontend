@@ -31,7 +31,7 @@ function InsightCard({ title, children }: { title: string; children: ReactNode }
 
 function SelectLayerPrompt() {
   return (
-    <PanelEmpty message="Active uma camada para ver a análise dos dados no mapa." />
+    <PanelEmpty message="Ative uma camada para ver a análise dos dados no mapa." />
   );
 }
 
@@ -65,7 +65,12 @@ function FireAnalysis() {
           <PanelValue
             label="No mapa"
             value={fireCounts.count}
-            sub={`${fireCounts.count} pontos visíveis`}
+            decimals={0}
+            sub={
+              fireCounts.totalMatching != null && fireCounts.totalMatching > fireCounts.count
+                ? `de ${fireCounts.totalMatching.toLocaleString('pt-BR')} no total`
+                : undefined
+            }
           />
         </InsightCard>
       )}
@@ -74,20 +79,17 @@ function FireAnalysis() {
         <>
           {sismosCounts && (
             <InsightCard title="Sismos">
-              <PanelValue
-                label="No mapa"
-                value={sismosCounts.count}
-                sub={`${sismosCounts.count} pontos visíveis`}
-              />
+              <PanelValue label="No mapa" value={sismosCounts.count} decimals={0} />
             </InsightCard>
           )}
-          {earthquakes.isLoading && <PanelLoading label="A analisar sismos…" />}
+          {earthquakes.isLoading && <PanelLoading label="Analisando sismos…" />}
           {earthquakes.data && (
-            <InsightCard title="Actividade sísmica">
+            <InsightCard title="Atividade sísmica">
               <PanelValue
                 label="Últimas 24 horas"
                 value={earthquakes.data.features?.length ?? 0}
-                sub="Eventos registados globalmente"
+                decimals={0}
+                sub="Eventos registrados globalmente"
               />
             </InsightCard>
           )}
@@ -96,10 +98,10 @@ function FireAnalysis() {
 
       {eventsActive && (
         <>
-          {events.isLoading && <PanelLoading label="A analisar eventos…" />}
+          {events.isLoading && <PanelLoading label="Analisando eventos…" />}
           {events.isError && <PanelError error={events.error} />}
           {events.data?.events && events.data.events.length > 0 && (
-            <InsightCard title="Eventos naturais activos">
+            <InsightCard title="Eventos naturais ativos">
               <ul className="space-y-2">
                 {events.data.events.map((ev) => (
                   <li key={ev.id} className="flex justify-between gap-2 text-xs">
@@ -148,7 +150,7 @@ function OceanAnalysis() {
         </InsightCard>
       )}
       {oceanActive && hotspots.length > 0 && (
-        <InsightCard title="Regiões com mais registos">
+        <InsightCard title="Regiões com mais registros">
           <ul className="space-y-2 text-xs">
             {hotspots.map((h) => (
               <li key={h.label} className="flex justify-between glass-panel rounded p-2">
@@ -168,7 +170,7 @@ function OceanAnalysis() {
           />
         </InsightCard>
       )}
-      {oceanActive && counts?.count === 0 && <PanelEmpty message="Sem registos nesta camada." />}
+      {oceanActive && counts?.count === 0 && <PanelEmpty message="Sem registros nesta camada." />}
       {glaciersActive && glacierCounts?.count === 0 && (
         <PanelEmpty message="Aproxime o zoom numa região glaciar." />
       )}
@@ -192,22 +194,19 @@ function ClimateAnalysis() {
 
   return (
     <div className="flex flex-col gap-3 px-2 text-sm overflow-y-auto max-h-[50vh]">
-      {openAq.isLoading && <PanelLoading label="A analisar…" />}
+      {openAq.isLoading && <PanelLoading label="Analisando…" />}
       {openAq.isError && <PanelError error={openAq.error} />}
       {counts && (
         <InsightCard title="Estações de ar">
-          <PanelValue
-            label="No mapa"
-            value={counts.count}
-            sub={`${counts.count} pontos visíveis`}
-          />
+          <PanelValue label="No mapa" value={counts.count} decimals={0} />
         </InsightCard>
       )}
       {openAq.data?.results && (
         <InsightCard title="Poluentes">
           <PanelValue
-            label="Tipos monitorizados"
+            label="Tipos monitorados"
             value={openAq.data.results.length}
+            decimals={0}
             sub="Medidos pela rede global"
           />
         </InsightCard>
@@ -229,7 +228,12 @@ function ForestsAnalysis() {
           <PanelValue
             label="No mapa"
             value={counts.count}
-            sub={`${counts.count} pontos visíveis`}
+            decimals={0}
+            sub={
+              counts.totalMatching != null && counts.totalMatching > counts.count
+                ? `de ${counts.totalMatching.toLocaleString('pt-BR')} no total`
+                : undefined
+            }
           />
         </InsightCard>
       )}

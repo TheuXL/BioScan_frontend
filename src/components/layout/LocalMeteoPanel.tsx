@@ -1,22 +1,33 @@
+import { useState } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchMeteoForecast, fetchAirQuality, fetchMeteoArchive } from '../../api/endpoints/panel';
 import { fetchOpenAqLocationLatest, fetchOpenAqLocation } from '../../api/endpoints/openaq';
 import { PanelEmpty, PanelError, PanelLoading, PanelValue } from '../ui/PanelState';
 import { readAirQualityCurrent, readMeteoCurrent, readOpenAqLatest } from '../../lib/panelData';
-import { archiveDateRange, formatCoordinates } from '../../lib/format';
+import { archiveDateRange, formatCoordinates, formatDateShort } from '../../lib/format';
 
 interface LocalMeteoPanelProps {
   lat: number;
   lon: number;
-  onClose: () => void;
+  onClose?: () => void;
+  defaultExpanded?: boolean;
 }
 
-export function LocalMeteoPanel({ lat, lon, onClose }: LocalMeteoPanelProps) {
+export function LocalMeteoPanel({
+  lat,
+  lon,
+  onClose,
+  defaultExpanded = false,
+}: LocalMeteoPanelProps) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const archiveRange = archiveDateRange(7);
+
   const forecast = useQuery({
     queryKey: ['panel', 'meteo', 'forecast', lat, lon],
     queryFn: () => fetchMeteoForecast(lat, lon),
     staleTime: 300_000,
+    enabled: expanded,
   });
   const archive = useQuery({
     queryKey: ['panel', 'meteo', 'archive', lat, lon, archiveRange],
@@ -25,11 +36,13 @@ export function LocalMeteoPanel({ lat, lon, onClose }: LocalMeteoPanelProps) {
         daily: 'temperature_2m_max,temperature_2m_min',
       }),
     staleTime: 300_000,
+    enabled: expanded,
   });
   const air = useQuery({
     queryKey: ['panel', 'meteo', 'air-quality', lat, lon],
     queryFn: () => fetchAirQuality(lat, lon),
     staleTime: 300_000,
+    enabled: expanded,
   });
 
   const meteo = forecast.data ? readMeteoCurrent(forecast.data) : null;
@@ -37,64 +50,89 @@ export function LocalMeteoPanel({ lat, lon, onClose }: LocalMeteoPanelProps) {
   const archiveDaily = archive.data?.daily as
     | { time?: string[]; temperature_2m_max?: number[]; temperature_2m_min?: number[] }
     | undefined;
-  const lastArchiveDay = archiveDaily?.time?.length
-    ? archiveDaily.time.length - 1
-    : -1;
+  const lastArchiveDay = archiveDaily?.time?.length ? archiveDaily.time.length - 1 : -1;
 
   return (
-    <div className="space-y-4">
-      <p className="font-label-md text-secondary-container">{formatCoordinates(lat, lon)}</p>
-
-      {forecast.isLoading && <PanelLoading label="A carregar previsão…" />}
-      {forecast.isError && <PanelError error={forecast.error} />}
-      {meteo && (
-        <div className="glass-panel rounded-lg p-3 space-y-2">
-          <p className="font-label text-outline uppercase">Previsão local</p>
-          <PanelValue label="Temperatura" value={meteo.temperature} unit="°C" />
-          <PanelValue label="Humidade" value={meteo.humidity} unit="%" />
-          <PanelValue label="Vento" value={meteo.windSpeed} unit="km/h" />
-        </div>
-      )}
-      {!forecast.isLoading && !meteo && !forecast.isError && (
-        <PanelEmpty message="Previsão indisponível para esta coordenada." />
-      )}
-
-      {archive.isLoading && <PanelLoading label="A carregar arquivo…" />}
-      {archive.isError && <PanelError error={archive.error} />}
-      {lastArchiveDay >= 0 && archiveDaily && (
-        <div className="glass-panel rounded-lg p-3 space-y-2">
-          <p className="font-label text-outline uppercase">Histórico recente</p>
-          <PanelValue
-            label={`${archiveDaily.time?.[lastArchiveDay] ?? '—'}`}
-            value={archiveDaily.temperature_2m_max?.[lastArchiveDay]}
-            unit="°C max"
-          />
-          <PanelValue
-            label="Mínima"
-            value={archiveDaily.temperature_2m_min?.[lastArchiveDay]}
-            unit="°C"
-          />
-        </div>
-      )}
-
-      {air.isLoading && <PanelLoading label="A carregar qualidade do ar…" />}
-      {air.isError && <PanelError error={air.error} />}
-      {aqi && (
-        <div className="glass-panel rounded-lg p-3 space-y-2">
-          <p className="font-label text-outline uppercase">Qualidade do ar</p>
-          <PanelValue label="US AQI" value={aqi.usAqi} />
-          <PanelValue label="PM2.5" value={aqi.pm25} unit="µg/m³" />
-          <PanelValue label="PM10" value={aqi.pm10} unit="µg/m³" />
-        </div>
-      )}
-
+    <div className="space-y-3">
       <button
         type="button"
-        onClick={onClose}
-        className="text-xs text-outline hover:text-secondary-container"
+        onClick={() => setExpanded((v) => !v)}
+        className="w-full flex items-center justify-between text-left"
+        aria-expanded={expanded}
       >
-        Fechar localização
+        <span className="font-label text-outline uppercase text-xs">Contexto local</span>
+        {expanded ? (
+          <ChevronDown className="w-4 h-4 text-outline" />
+        ) : (
+          <ChevronRight className="w-4 h-4 text-outline" />
+        )}
       </button>
+
+      {!expanded && (
+        <p className="text-xs text-on-surface-variant">
+          Toque para ver previsão, histórico e qualidade do ar em{' '}
+          {formatCoordinates(lat, lon)}.
+        </p>
+      )}
+
+      {expanded && (
+        <div className="space-y-4">
+          <p className="font-label-md text-secondary-container">{formatCoordinates(lat, lon)}</p>
+
+          {forecast.isLoading && <PanelLoading label="Carregando previsão…" />}
+          {forecast.isError && <PanelError error={forecast.error} />}
+          {meteo && (
+            <div className="glass-panel rounded-lg p-3 space-y-2">
+              <p className="font-label text-outline uppercase">Previsão local</p>
+              <PanelValue label="Temperatura" value={meteo.temperature} unit="°C" />
+              <PanelValue label="Umidade" value={meteo.humidity} unit="%" decimals={0} />
+              <PanelValue label="Vento" value={meteo.windSpeed} unit="km/h" />
+            </div>
+          )}
+          {!forecast.isLoading && !meteo && !forecast.isError && (
+            <PanelEmpty message="Previsão indisponível para esta coordenada." />
+          )}
+
+          {archive.isLoading && <PanelLoading label="Carregando histórico…" />}
+          {archive.isError && <PanelError error={archive.error} />}
+          {lastArchiveDay >= 0 && archiveDaily && (
+            <div className="glass-panel rounded-lg p-3 space-y-2">
+              <p className="font-label text-outline uppercase">Histórico recente</p>
+              <PanelValue
+                label={formatDateShort(archiveDaily.time?.[lastArchiveDay] ?? null)}
+                value={archiveDaily.temperature_2m_max?.[lastArchiveDay]}
+                unit="°C máx"
+              />
+              <PanelValue
+                label="Mínima"
+                value={archiveDaily.temperature_2m_min?.[lastArchiveDay]}
+                unit="°C"
+              />
+            </div>
+          )}
+
+          {air.isLoading && <PanelLoading label="Carregando qualidade do ar…" />}
+          {air.isError && <PanelError error={air.error} />}
+          {aqi && (
+            <div className="glass-panel rounded-lg p-3 space-y-2">
+              <p className="font-label text-outline uppercase">Qualidade do ar</p>
+              <PanelValue label="US AQI" value={aqi.usAqi} decimals={0} />
+              <PanelValue label="PM2.5" value={aqi.pm25} unit="µg/m³" />
+              <PanelValue label="PM10" value={aqi.pm10} unit="µg/m³" />
+            </div>
+          )}
+
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs text-outline hover:text-secondary-container"
+            >
+              Fechar localização
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

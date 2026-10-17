@@ -8,7 +8,7 @@ export function topDebrisRegions(pontos: PontoGloboV1[], limit = 5) {
     const lonKey = Math.round(p.lon / 5) * 5;
     const key = `${latKey}_${lonKey}`;
     const latDir = latKey >= 0 ? 'N' : 'S';
-    const lonDir = lonKey >= 0 ? 'E' : 'W';
+    const lonDir = lonKey >= 0 ? 'L' : 'O';
     const label = `${Math.abs(latKey)}°${latDir}, ${Math.abs(lonKey)}°${lonDir}`;
     const prev = buckets.get(key);
     buckets.set(key, { label, count: (prev?.count ?? 0) + 1 });
@@ -24,7 +24,7 @@ export function extractSeaLevelSummary(payload: unknown): string | null {
     const feed = p.feed as Record<string, unknown>;
     if (Array.isArray(feed.entry) && feed.entry.length === 0) return null;
     if (feed.updated) {
-      return new Intl.DateTimeFormat('pt-PT', { dateStyle: 'medium' }).format(
+      return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(
         new Date(String(feed.updated)),
       );
     }

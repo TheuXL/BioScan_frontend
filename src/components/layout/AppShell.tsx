@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Layers, ChevronUp, ChevronDown } from 'lucide-react';
 import { TopBar } from './TopBar';
 import { LayerSidebar } from './LayerSidebar';
 import { DetailPanel } from './DetailPanel';
@@ -18,8 +19,11 @@ export function AppShell() {
   const setDomain = useAppStore((s) => s.setDomain);
   const sidebarTab = useAppStore((s) => s.ui.sidebarTab);
   const setSidebarTab = useAppStore((s) => s.setSidebarTab);
+  const sidebarOpen = useAppStore((s) => s.ui.sidebarOpen);
+  const toggleSidebar = useAppStore((s) => s.toggleSidebar);
   const selectedPoint = useAppStore((s) => s.selectedPoint);
   const pickedLocation = useAppStore((s) => s.pickedLocation);
+  const detailVisible = Boolean(selectedPoint || pickedLocation);
 
   const healthQuery = useQuery({
     queryKey: ['health'],
@@ -62,7 +66,7 @@ export function AppShell() {
         <GlobeLayersHost />
 
         <div className="relative z-10 flex-1 flex pointer-events-none">
-          {!selectedPoint && !pickedLocation && <DomainPanel domain={activeDomain} />}
+          {!detailVisible && <DomainPanel domain={activeDomain} />}
         </div>
 
         <LayerLegend />
@@ -72,13 +76,46 @@ export function AppShell() {
       <DetailPanel />
       <AppFooter />
 
-      <div className="md:hidden fixed bottom-12 left-0 right-0 z-40 glass-panel border-t border-white/10 rounded-t-xl">
-        <LayerSidebar
-          domain={activeDomain}
-          activeTab={sidebarTab}
-          onTabChange={setSidebarTab}
-          mobile
-        />
+      <div className="md:hidden fixed bottom-12 left-0 right-0 z-40 pointer-events-none">
+        {!sidebarOpen && (
+          <div className="flex justify-center pb-2 pointer-events-auto">
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className="glass-panel rounded-full px-4 py-2 flex items-center gap-2 text-sm text-on-surface border border-white/10 shadow-lg"
+              aria-expanded={false}
+              aria-controls="mobile-layers-sheet"
+            >
+              <Layers className="w-4 h-4 text-secondary-container" />
+              Camadas
+              <ChevronUp className="w-4 h-4 text-outline" />
+            </button>
+          </div>
+        )}
+
+        {sidebarOpen && (
+          <div
+            id="mobile-layers-sheet"
+            className="glass-panel border-t border-white/10 rounded-t-xl pointer-events-auto max-h-[45vh] flex flex-col"
+          >
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className="flex items-center justify-center gap-2 py-2 text-xs text-outline border-b border-white/5"
+              aria-expanded
+              aria-controls="mobile-layers-sheet"
+            >
+              Recolher
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+            <LayerSidebar
+              domain={activeDomain}
+              activeTab={sidebarTab}
+              onTabChange={setSidebarTab}
+              mobile
+            />
+          </div>
+        )}
       </div>
     </div>
   );

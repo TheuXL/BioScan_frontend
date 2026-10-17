@@ -23,7 +23,7 @@ interface DomainPanelProps {
 function SelectLayerPrompt() {
   return (
     <GlassCard active className="w-full pointer-events-auto">
-      <PanelEmpty message="Active uma camada na barra lateral para ver indicadores no mapa." />
+      <PanelEmpty message="Ative uma camada na barra lateral para ver indicadores no mapa." />
     </GlassCard>
   );
 }
@@ -72,11 +72,11 @@ function FirePanel() {
 
         {eventsActive && (
           <>
-            {events.isLoading && <PanelLoading label="A carregar eventos…" />}
+            {events.isLoading && <PanelLoading label="Carregando eventos…" />}
             {events.isError && <PanelError error={events.error} />}
             {events.data?.events && events.data.events.length > 0 && (
               <div>
-                <h4 className="font-label text-outline uppercase mb-2">Eventos naturais activos</h4>
+                <h4 className="font-label text-outline uppercase mb-2">Eventos naturais ativos</h4>
                 <div className="space-y-2 text-sm">
                   {events.data.events.map((ev) => (
                     <div key={ev.id} className="glass-panel rounded p-2">
@@ -88,7 +88,7 @@ function FirePanel() {
               </div>
             )}
             {events.data?.events?.length === 0 && (
-              <PanelEmpty message="Nenhum evento natural activo no momento." />
+              <PanelEmpty message="Nenhum evento natural ativo no momento." />
             )}
           </>
         )}
@@ -132,7 +132,7 @@ function OceanPanel() {
             {hotspots.length > 0 && (
               <div>
                 <span className="font-label text-outline uppercase flex items-center gap-1 mb-2">
-                  <Trash2 className="w-3 h-3" /> Regiões com mais registos
+                  <Trash2 className="w-3 h-3" /> Regiões com mais registros
                 </span>
                 <div className="space-y-2 text-sm">
                   {hotspots.map((h) => (
@@ -144,7 +144,7 @@ function OceanPanel() {
                 </div>
               </div>
             )}
-            {counts.count === 0 && <PanelEmpty message="Sem registos de detritos nesta vista." />}
+            {counts.count === 0 && <PanelEmpty message="Sem registros de detritos nesta vista." />}
           </>
         )}
 
@@ -195,7 +195,7 @@ function ClimatePanel() {
       {openAqParams.data?.results && (
         <div className="mt-4">
           <PanelValue
-            label="Poluentes monitorizados"
+            label="Poluentes monitorados"
             value={openAqParams.data.results.length}
             sub="Tipos de poluição medidos na rede"
           />

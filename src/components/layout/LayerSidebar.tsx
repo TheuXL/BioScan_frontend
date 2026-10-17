@@ -2,15 +2,11 @@ import {
   Layers,
   BarChart3,
   Radio,
-  Download,
-  HelpCircle,
-  FolderOpen,
   Waves,
   Thermometer,
   TreePine,
   Flame,
 } from 'lucide-react';
-import { Button } from '../ui/Button';
 import { LayerToggle } from '../layers/LayerToggle';
 import { AnalysisTab } from './AnalysisTab';
 import { MonitoringTab } from './MonitoringTab';
@@ -30,6 +26,12 @@ const DOMAIN_ICONS: Record<AppDomain, typeof Flame> = {
   forests: TreePine,
 };
 
+const TAB_LABELS: Record<SidebarTab, string> = {
+  layers: 'Camadas',
+  analysis: 'Análise',
+  monitoring: 'Monitoramento',
+};
+
 interface LayerSidebarProps {
   domain: AppDomain;
   activeTab: SidebarTab;
@@ -42,7 +44,7 @@ export function LayerSidebar({ domain, activeTab, onTabChange, mobile = false }:
   const DomainIcon = DOMAIN_ICONS[domain];
 
   const sidebarClass = mobile
-    ? 'flex flex-col p-4 max-h-[50vh] overflow-y-auto'
+    ? 'flex flex-col p-4 overflow-y-auto min-h-0'
     : 'hidden md:flex fixed left-0 top-16 bottom-0 w-80 z-40 flex-col p-4 bg-surface-container/80 backdrop-blur-xl border-r border-secondary/20';
 
   return (
@@ -52,9 +54,9 @@ export function LayerSidebar({ domain, activeTab, onTabChange, mobile = false }:
           <DomainIcon className="w-5 h-5 text-secondary-container" />
         </div>
         <div>
-          <h2 className="text-lg font-medium text-on-surface">Environmental Layers</h2>
+          <h2 className="text-lg font-medium text-on-surface">Camadas ambientais</h2>
           <p className="font-label text-on-surface-variant">
-            {getDomainLabel(domain)} · Global Monitoring
+            {getDomainLabel(domain)} · Monitoramento global
           </p>
         </div>
       </div>
@@ -62,7 +64,6 @@ export function LayerSidebar({ domain, activeTab, onTabChange, mobile = false }:
       <nav className="flex flex-col gap-1 mb-4">
         {(['layers', 'analysis', 'monitoring'] as SidebarTab[]).map((tab) => {
           const Icon = TAB_ICONS[tab];
-          const labels = { layers: 'Data Layers', analysis: 'Analysis', monitoring: 'Monitoring' };
           return (
             <button
               key={tab}
@@ -75,7 +76,7 @@ export function LayerSidebar({ domain, activeTab, onTabChange, mobile = false }:
               }`}
             >
               <Icon className="w-4 h-4" />
-              {labels[tab]}
+              {TAB_LABELS[tab]}
             </button>
           );
         })}
@@ -85,7 +86,7 @@ export function LayerSidebar({ domain, activeTab, onTabChange, mobile = false }:
         <div className="flex-1 overflow-y-auto flex flex-col gap-2 min-h-0">
           {layers.length === 0 ? (
             <p className="text-sm text-on-surface-variant px-2">
-              Nenhuma camada de globo neste domínio. Consulte painéis laterais.
+              Nenhuma camada de globo neste domínio. Consulte os painéis laterais.
             </p>
           ) : (
             layers.map((layer) => <LayerToggle key={layer.id} layer={layer} />)
@@ -96,29 +97,6 @@ export function LayerSidebar({ domain, activeTab, onTabChange, mobile = false }:
       {activeTab === 'analysis' && <AnalysisTab domain={domain} />}
 
       {activeTab === 'monitoring' && <MonitoringTab />}
-
-      <div className="mt-auto pt-4 border-t border-white/5 flex flex-col gap-3">
-        <Button variant="ghost" className="w-full">
-          <Download className="w-4 h-4" />
-          Export Data
-        </Button>
-        <div className="flex flex-col gap-1">
-          <a
-            href="#"
-            className="flex items-center gap-3 text-on-surface-variant px-4 py-2 font-label hover:bg-surface-bright/50 rounded-lg text-sm"
-          >
-            <HelpCircle className="w-4 h-4" />
-            Help
-          </a>
-          <a
-            href="#"
-            className="flex items-center gap-3 text-on-surface-variant px-4 py-2 font-label hover:bg-surface-bright/50 rounded-lg text-sm"
-          >
-            <FolderOpen className="w-4 h-4" />
-            Sources
-          </a>
-        </div>
-      </div>
     </aside>
   );
 }
